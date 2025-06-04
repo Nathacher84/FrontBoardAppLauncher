@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Music Visualizer</title>
+<style>
+  body { margin: 0; background: #000; color: white; font-family: Arial, sans-serif; }
+  #controls { position: fixed; top: 10px; left: 10px; z-index: 10; }
+  button, select { margin-right: 5px; }
+  #playBtn.playing { background: red; }
+  #playBtn.paused { background: blue; }
+  canvas { display: block; width: 100vw; height: 100vh; }
+</style>
+</head>
+<body>
+<div id="controls">
+  <input type="file" id="audioFile" accept="audio/*">
+  <select id="modeSelect">
+    <option value="bars">Bars</option>
+    <option value="wave">Wave</option>
+    <option value="mirror">Mirror</option>
+    <option value="circle">Circle</option>
+    <option value="spiral">Spiral</option>
+  </select>
+  <button id="playBtn" class="paused">Play/Pause</button>
+</div>
+<canvas id="canvas"></canvas>
+<script>
+let audioCtx, analyser, source, dataArray, bufferLength, isPlaying = false;
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const playBtn = document.getElementById('playBtn');
+const modeSelect = document.getElementById('modeSelect');
+const audioFile = document.getElementById('audioFile');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+function initAudio(file) {
+  if (audioCtx) audioCtx.close();
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    audioCtx.decodeAudioData(e.target.result, buffer => {
+      if (source) source.disconnect();
+      source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+      bufferLength = analyser.frequencyBinCount;
+      dataArray = new Uint8Array(bufferLength);
+      if (isPlaying) source.start(0);
+    });
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+audioFile.onchange = e => {
+  const file = e.target.files[0];
+  if (file) initAudio(file);
+};
+
+playBtn.onclick = () => {
+  if (!audioCtx) return;
+  if (!isPlaying) {
+    source.start(0);
+    isPlaying = true;
+    playBtn.classList.remove('paused');
+    playBtn.classList.add('playing');
+  } else {
+    source.stop();
+    isPlaying = false;
+    initAudio(audioFile.files[0]);
+    playBtn.classList.remove('playing');
+    playBtn.classList.add('paused');
+  }
+};
+
+function draw() {
+  requestAnimationFrame(draw);
+  if (!analyser) return;
+  analyser.getByteFrequencyData(dataArray);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const mode = modeSelect.value;
+  if (mode === 'bars') drawBars();
+  else if (mode === 'wave') drawWave();
+  else if (mode === 'mirror') drawMirror();
+  else if (mode === 'circle') drawCircle();
+  else if (mode === 'spiral') drawSpiral();
+}
+
+function drawBars() {
+  const barWidth = (canvas.width / bufferLength) * 2.5;
+  let x = 0;
+  for (let i = 0; i < bufferLength; i++) {
+    const barHeight = dataArray[i];
+    ctx.fillStyle = 'rgb(' + (barHeight + 100) + ',50,50)';
+    ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+    x += barWidth + 1;
+  }
+}
+
+function drawWave() {
+  analyser.getByteTimeDomainData(dataArray);
+  ctx.beginPath();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#0f0';
+  const sliceWidth = canvas.width / bufferLength;
+  let x = 0;
+  for (let i = 0; i < bufferLength; i++) {
+    const v = dataArray[i] / 128.0;
+    const y = v * canvas.height / 2;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+    x += sliceWidth;
+  }
+  ctx.lineTo(canvas.width, canvas.height / 2);
+  ctx.stroke();
+}
+
+function drawMirror() {
+  const barWidth = (canvas.width / bufferLength) * 2.5;
+  let x = 0;
+  for (let i = 0; i < bufferLength; i++) {
+    const barHeight = dataArray[i];
+    ctx.fillStyle = 'rgb(50,' + (barHeight + 100) + ',200)';
+    ctx.fillRect(x, canvas.height / 2 - barHeight / 2, barWidth, barHeight);
+    ctx.fillRect(canvas.width - x - barWidth, canvas.height / 2 - barHeight / 2, barWidth, barHeight);
+    x += barWidth + 1;
+  }
+}
+
+function drawCircle() {
+  const radius = Math.min(canvas.width, canvas.height) / 4;
+  ctx.save();
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  for (let i = 0; i < bufferLength; i++) {
+    const v = dataArray[i] / 255.0;
+    const angle = i / bufferLength * Math.PI * 2;
+    const h = radius * v;
+    ctx.strokeStyle = `hsl(${i / bufferLength * 360}, 100%, 50%)`;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+    ctx.lineTo(Math.cos(angle) * (radius + h), Math.sin(angle) * (radius + h));
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawSpiral() {
+  ctx.save();
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.rotate(Date.now() / 5000);
+  for (let i = 0; i < bufferLength; i++) {
+    const v = dataArray[i] / 255.0;
+    const angle = i / bufferLength * Math.PI * 4;
+    const dist = v * Math.min(canvas.width, canvas.height) / 3;
+    ctx.fillStyle = `hsl(${i / bufferLength * 360},100%,50%)`;
+    ctx.beginPath();
+    ctx.arc(Math.cos(angle) * dist, Math.sin(angle) * dist, 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+draw();
+</script>
+</body>
+</html>
