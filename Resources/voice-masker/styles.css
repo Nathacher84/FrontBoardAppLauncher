@@ -1,0 +1,234 @@
+:root {
+  color-scheme: light dark;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at top, #121621, #090b13 60%, #05060a 100%);
+  color: #f5f7ff;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.app-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+header {
+  text-align: center;
+  display: grid;
+  gap: 0.5rem;
+}
+
+header h1 {
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  margin: 0;
+}
+
+header p {
+  margin: 0;
+  opacity: 0.8;
+}
+
+.card {
+  background: rgba(15, 18, 30, 0.75);
+  border: 1px solid rgba(82, 94, 136, 0.25);
+  border-radius: 18px;
+  padding: 1.5rem;
+  box-shadow: 0 18px 35px rgba(3, 4, 9, 0.55);
+  backdrop-filter: blur(14px);
+  display: grid;
+  gap: 1rem;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.primary {
+  background: linear-gradient(135deg, #1c6fe8, #5121ff);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(39, 109, 255, 0.35);
+}
+
+.status {
+  font-size: 0.95rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.status-on {
+  background: rgba(55, 214, 156, 0.2);
+  color: #4cd1a0;
+}
+
+.status-off {
+  background: rgba(255, 89, 103, 0.2);
+  color: #ff8ba3;
+}
+
+.meters {
+  display: grid;
+  gap: 0.35rem;
+}
+
+progress {
+  appearance: none;
+  width: 100%;
+  height: 0.7rem;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+progress::-webkit-progress-bar {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+progress::-webkit-progress-value {
+  background: linear-gradient(135deg, #15c4a7, #3e6be8);
+  border-radius: 999px;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.profile {
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(90, 112, 196, 0.3);
+  background: rgba(40, 46, 80, 0.45);
+  color: inherit;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, border 0.2s ease, background 0.2s ease;
+}
+
+.profile:hover {
+  transform: translateY(-2px);
+  border-color: rgba(136, 196, 255, 0.55);
+  background: rgba(65, 76, 128, 0.6);
+}
+
+.profile.active {
+  border-color: #4cd1a0;
+  box-shadow: 0 0 0 1px rgba(76, 209, 160, 0.3);
+}
+
+.ai-coach {
+  background: rgba(12, 135, 179, 0.15);
+  border-radius: 16px;
+  padding: 1rem;
+  border: 1px solid rgba(45, 169, 221, 0.25);
+  display: grid;
+  gap: 0.5rem;
+}
+
+.ai-coach h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.ai-suggestion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.95rem;
+}
+
+.slider {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.slider label {
+  font-weight: 600;
+}
+
+.slider input[type='range'] {
+  width: 100%;
+}
+
+.value {
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+.tts-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+textarea {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(90, 112, 196, 0.35);
+  padding: 1rem;
+  background: rgba(9, 12, 22, 0.6);
+  color: inherit;
+  resize: vertical;
+  min-height: 120px;
+}
+
+.tts-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+select {
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  background: rgba(15, 18, 30, 0.8);
+  color: inherit;
+  border: 1px solid rgba(93, 116, 199, 0.45);
+}
+
+footer {
+  text-align: center;
+  opacity: 0.65;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .primary {
+    width: 100%;
+  }
+
+  .profile-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
