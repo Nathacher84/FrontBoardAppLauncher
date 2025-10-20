@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modulador de Voz IA para Safari</title>
+  <style>
+    :root {
+      color-scheme: dark light;
+      font-family: "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      --accent: #5b8def;
+      --bg: #0b0c10;
+      --card: rgba(255, 255, 255, 0.08);
+      --text: #f5f5f7;
+      --border: rgba(255, 255, 255, 0.12);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, rgba(91, 141, 239, 0.25), transparent 55%),
+        linear-gradient(160deg, var(--bg), #11161f);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 1.5rem 4rem;
+      box-sizing: border-box;
+    }
+
+    .app {
+      width: min(980px, 100%);
+      background: var(--card);
+      backdrop-filter: blur(18px);
+      border-radius: 28px;
+      border: 1px solid var(--border);
+      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.35);
+      padding: 2.5rem;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 2.9rem);
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    p.subtitle {
+      margin: 0.35rem 0 2rem;
+      color: rgba(245, 245, 247, 0.75);
+      font-size: 1.05rem;
+    }
+
+    section {
+      margin-top: 2.5rem;
+      padding: 1.5rem 1.8rem;
+      border-radius: 22px;
+      background: rgba(10, 13, 20, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    section h2 {
+      margin-top: 0;
+      font-size: 1.55rem;
+    }
+
+    button, select, input[type="range"] {
+      appearance: none;
+      font-family: inherit;
+    }
+
+    .control-row {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      align-items: end;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .primary-btn {
+      border: none;
+      border-radius: 16px;
+      padding: 0.85rem 1.75rem;
+      background: linear-gradient(135deg, #5277f7, #364bff);
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 18px 40px rgba(82, 119, 247, 0.35);
+    }
+
+    .primary-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 10px 24px rgba(82, 119, 247, 0.45);
+    }
+
+    .status {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: rgba(245, 245, 247, 0.75);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      resize: vertical;
+      background: rgba(0, 0, 0, 0.35);
+      color: inherit;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .preset-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .preset-buttons button {
+      flex: 1 1 180px;
+      padding: 0.75rem 1rem;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.08);
+      color: inherit;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .preset-buttons button:hover {
+      background: rgba(91, 141, 239, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .meter {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      margin-top: 1.25rem;
+    }
+
+    .meter span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #41c67a, #f2c94c, #ff4d6d);
+      transition: width 0.15s ease;
+    }
+
+    @media (max-width: 640px) {
+      .app {
+        padding: 1.75rem;
+      }
+
+      section {
+        margin-top: 2rem;
+        padding: 1.25rem;
+      }
+
+      .preset-buttons button {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>Modulador de Voz con IA</h1>
+      <p class="subtitle">Controla tu voz en tiempo real, aplica distorsión extrema y genera voces sintéticas graves listas para tus atajos.</p>
+    </header>
+
+    <section aria-labelledby="voz-real">
+      <h2 id="voz-real">Transformación en vivo</h2>
+      <div class="preset-buttons">
+        <button type="button" data-preset="0">Titan de Órbita</button>
+        <button type="button" data-preset="1">Sombra Subterránea</button>
+        <button type="button" data-preset="2">Eco Abisal</button>
+      </div>
+      <div class="control-row">
+        <label>
+          Ajuste de Pitch (voz grave)
+          <input type="range" id="pitch" min="0.3" max="1.2" step="0.01" value="0.5" />
+        </label>
+        <label>
+          Nivel de Distorsión
+          <input type="range" id="distortion" min="0" max="400" value="220" />
+        </label>
+        <label>
+          Mezcla de Voz Procesada
+          <input type="range" id="wet" min="0" max="1" step="0.01" value="0.9" />
+        </label>
+      </div>
+      <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <button class="primary-btn" id="start">Iniciar captura</button>
+        <button class="primary-btn" id="stop" style="background: rgba(255, 255, 255, 0.08); color: var(--text); box-shadow: none;">Detener</button>
+      </div>
+      <div class="status" id="status">Micrófono inactivo.</div>
+      <div class="meter" aria-hidden="true"><span id="meter-bar"></span></div>
+    </section>
+
+    <section aria-labelledby="voz-sintetica">
+      <h2 id="voz-sintetica">Texto a voz oscura</h2>
+      <textarea id="ttsText" placeholder="Escribe o pega tu texto aquí..."></textarea>
+      <div class="control-row" style="margin-top: 1.5rem;">
+        <label>
+          Voz disponible del sistema
+          <select id="voiceSelect"></select>
+        </label>
+        <label>
+          Pitch sintético
+          <input type="range" id="ttsPitch" min="0" max="2" step="0.05" value="0.4" />
+        </label>
+        <label>
+          Velocidad
+          <input type="range" id="ttsRate" min="0.5" max="1.5" step="0.05" value="0.85" />
+        </label>
+      </div>
+      <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <button class="primary-btn" id="speak">Reproducir voz sintética</button>
+        <button class="primary-btn" id="stopTTS" style="background: rgba(255, 255, 255, 0.08); color: var(--text); box-shadow: none;">Detener voz</button>
+      </div>
+      <div class="status" id="ttsStatus">Listo para generar voz sintética.</div>
+    </section>
+  </main>
+
+  <script>
+    // --- Utilidad de distorsión ---
+    function makeDistortionCurve(amount) {
+      const k = typeof amount === 'number' ? amount : 0;
+      const n_samples = 44100;
+      const curve = new Float32Array(n_samples);
+      const deg = Math.PI / 180;
+      let i = 0;
+      let x;
+      for (; i < n_samples; ++i) {
+        x = (i * 2) / n_samples - 1;
+        curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+      }
+      return curve;
+    }
+
+    // --- Algoritmo Jungle Pitch Shifter (WebAudio Demo adaptado) ---
+    class Jungle {
+      constructor(context) {
+        this.context = context;
+        const delayTime = 0.1;
+
+        const input = context.createGain();
+        const output = context.createGain();
+        const delay1 = context.createDelay(delayTime);
+        const delay2 = context.createDelay(delayTime);
+        const fade = context.createGain();
+        const mix = context.createGain();
+        const feedback = context.createGain();
+        const mod1 = context.createOscillator();
+        const mod2 = context.createOscillator();
+        const modGain1 = context.createGain();
+        const modGain2 = context.createGain();
+
+        delay1.delayTime.value = delayTime;
+        delay2.delayTime.value = delayTime;
+        fade.gain.value = 1.0;
+        mix.gain.value = 0.5;
+        feedback.gain.value = 0.0;
+        mod1.type = 'sawtooth';
+        mod2.type = 'sawtooth';
+        mod1.frequency.value = 0.25;
+        mod2.frequency.value = 0.25;
+        modGain1.gain.value = 0;
+        modGain2.gain.value = 0;
+
+        input.connect(delay1);
+        input.connect(delay2);
+        delay1.connect(mix);
+        delay2.connect(mix);
+        mix.connect(fade);
+        fade.connect(output);
+
+        delay1.connect(feedback);
+        feedback.connect(delay1);
+
+        mod1.connect(modGain1);
+        modGain1.connect(delay1.delayTime);
+        mod2.connect(modGain2);
+        modGain2.connect(delay2.delayTime);
+        mod1.start();
+        mod2.start();
+
+        this.input = input;
+        this.output = output;
+        this.delay1 = delay1;
+        this.delay2 = delay2;
+        this.mix = mix;
+        this.feedback = feedback;
+        this.mod1 = mod1;
+        this.mod2 = mod2;
+        this.modGain1 = modGain1;
+        this.modGain2 = modGain2;
+
+        this.setPitchOffset(0.5);
+      }
+
+      setPitchOffset(mult) {
+        const baseWidth = 0.04;
+        const sign = mult >= 1 ? -1 : 1;
+        const depth = baseWidth * (1 + Math.abs(1 - mult) * 6);
+        const rate = 0.12 + Math.abs(1 - mult) * 1.25;
+
+        this.modGain1.gain.value = depth * sign;
+        this.modGain2.gain.value = -depth * sign;
+        this.mod1.frequency.value = rate;
+        this.mod2.frequency.value = rate;
+      }
+    }
+
+    const state = {
+      context: null,
+      stream: null,
+      source: null,
+      analyser: null,
+      jungle: null,
+      distortion: null,
+      wetGain: null,
+      dryGain: null,
+      meterData: new Uint8Array(256),
+      active: false,
+      presets: [
+        { name: 'Titan de Órbita', pitch: 0.4, distortion: 320, wet: 1 },
+        { name: 'Sombra Subterránea', pitch: 0.35, distortion: 260, wet: 0.85 },
+        { name: 'Eco Abisal', pitch: 0.3, distortion: 360, wet: 0.9 }
+      ]
+    };
+
+    const pitchControl = document.getElementById('pitch');
+    const distControl = document.getElementById('distortion');
+    const wetControl = document.getElementById('wet');
+    const statusLabel = document.getElementById('status');
+    const meterBar = document.getElementById('meter-bar');
+
+    async function initAudio() {
+      if (state.active) return;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        state.context = state.context || new (window.AudioContext || window.webkitAudioContext)();
+        if (state.context.state === 'suspended') {
+          await state.context.resume();
+        }
+        const context = state.context;
+        const source = context.createMediaStreamSource(stream);
+        const jungle = new Jungle(context);
+        const distortion = context.createWaveShaper();
+        const wetGain = context.createGain();
+        const dryGain = context.createGain();
+        const analyser = context.createAnalyser();
+
+        distortion.curve = makeDistortionCurve(parseFloat(distControl.value));
+        distortion.oversample = '4x';
+        wetGain.gain.value = parseFloat(wetControl.value);
+        dryGain.gain.value = 1 - wetGain.gain.value;
+
+        source.connect(jungle.input);
+        jungle.output.connect(distortion);
+        distortion.connect(wetGain);
+        source.connect(dryGain);
+
+        const merger = context.createGain();
+        wetGain.connect(merger);
+        dryGain.connect(merger);
+        merger.connect(analyser);
+        analyser.connect(context.destination);
+
+        state.stream = stream;
+        state.source = source;
+        state.jungle = jungle;
+        state.distortion = distortion;
+        state.wetGain = wetGain;
+        state.dryGain = dryGain;
+        state.analyser = analyser;
+        state.active = true;
+        statusLabel.textContent = 'Micrófono activo y voz procesada.';
+
+        animateMeter();
+      } catch (err) {
+        console.error(err);
+        statusLabel.textContent = 'No se pudo acceder al micrófono: ' + err.message;
+      }
+    }
+
+    function stopAudio() {
+      if (!state.active) return;
+      if (state.stream) {
+        state.stream.getTracks().forEach((track) => track.stop());
+      }
+      state.stream = null;
+      if (state.context) {
+        state.context.close();
+      }
+      state.context = null;
+      state.source = null;
+      state.jungle = null;
+      state.distortion = null;
+      state.wetGain = null;
+      state.dryGain = null;
+      state.analyser = null;
+      state.active = false;
+      statusLabel.textContent = 'Micrófono inactivo.';
+      meterBar.style.width = '0%';
+    }
+
+    function animateMeter() {
+      if (!state.analyser) return;
+      state.analyser.getByteFrequencyData(state.meterData);
+      let sum = 0;
+      for (let i = 0; i < state.meterData.length; i++) {
+        sum += state.meterData[i];
+      }
+      const avg = sum / state.meterData.length;
+      meterBar.style.width = Math.min(100, (avg / 255) * 100) + '%';
+      if (state.active) {
+        requestAnimationFrame(animateMeter);
+      }
+    }
+
+    function updatePitch(value) {
+      const pitch = parseFloat(value);
+      if (state.jungle) {
+        state.jungle.setPitchOffset(pitch);
+      }
+      pitchControl.value = pitch;
+    }
+
+    function updateDistortion(value) {
+      const amount = parseFloat(value);
+      if (state.distortion) {
+        state.distortion.curve = makeDistortionCurve(amount);
+      }
+      distControl.value = amount;
+    }
+
+    function updateWetMix(value) {
+      const wet = parseFloat(value);
+      if (state.wetGain && state.dryGain) {
+        state.wetGain.gain.value = wet;
+        state.dryGain.gain.value = 1 - wet;
+      }
+      wetControl.value = wet;
+    }
+
+    document.getElementById('start').addEventListener('click', initAudio);
+    document.getElementById('stop').addEventListener('click', stopAudio);
+
+    pitchControl.addEventListener('input', (e) => updatePitch(e.target.value));
+    distControl.addEventListener('input', (e) => updateDistortion(e.target.value));
+    wetControl.addEventListener('input', (e) => updateWetMix(e.target.value));
+
+    document.querySelectorAll('.preset-buttons button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const preset = state.presets[parseInt(btn.dataset.preset, 10)];
+        updatePitch(preset.pitch);
+        updateDistortion(preset.distortion);
+        updateWetMix(preset.wet);
+        statusLabel.textContent = `Preset "${preset.name}" aplicado.`;
+      });
+    });
+
+    // --- Texto a voz ---
+    const voiceSelect = document.getElementById('voiceSelect');
+    const ttsStatus = document.getElementById('ttsStatus');
+    const ttsPitch = document.getElementById('ttsPitch');
+    const ttsRate = document.getElementById('ttsRate');
+
+    function populateVoices() {
+      const voices = window.speechSynthesis.getVoices();
+      voiceSelect.innerHTML = '';
+      voices.forEach((voice, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = `${voice.name} (${voice.lang})${voice.default ? ' — Predeterminada' : ''}`;
+        voiceSelect.appendChild(option);
+      });
+      if (!voices.length) {
+        const opt = document.createElement('option');
+        opt.textContent = 'Voces del sistema no disponibles';
+        voiceSelect.appendChild(opt);
+      }
+    }
+
+    populateVoices();
+    if (typeof speechSynthesis !== 'undefined') {
+      speechSynthesis.onvoiceschanged = populateVoices;
+    }
+
+    document.getElementById('speak').addEventListener('click', () => {
+      const text = document.getElementById('ttsText').value.trim();
+      if (!text) {
+        ttsStatus.textContent = 'Escribe un texto para generar voz.';
+        return;
+      }
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voices = window.speechSynthesis.getVoices();
+      const selected = voices[voiceSelect.value];
+      if (selected) {
+        utterance.voice = selected;
+      }
+      utterance.pitch = parseFloat(ttsPitch.value);
+      utterance.rate = parseFloat(ttsRate.value);
+      utterance.onstart = () => (ttsStatus.textContent = 'Reproduciendo voz sintética...');
+      utterance.onend = () => (ttsStatus.textContent = 'Listo para generar voz sintética.');
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utterance);
+    });
+
+    document.getElementById('stopTTS').addEventListener('click', () => {
+      speechSynthesis.cancel();
+      ttsStatus.textContent = 'Voz sintética detenida.';
+    });
+
+    // Asegurar reanudación del contexto en Safari cuando se interactúa con la página
+    document.addEventListener('touchend', () => {
+      if (state.context && state.context.state === 'suspended') {
+        state.context.resume();
+      }
+    }, { passive: true });
+  </script>
+</body>
+</html>
