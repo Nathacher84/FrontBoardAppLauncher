@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voice Masker IA</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header>
+      <h1>Voice Masker IA</h1>
+      <p>Cambia tu voz en tiempo real, controla el pitch y aplica distorsión profunda asistida con algoritmos de IA.</p>
+    </header>
+
+    <section class="card" id="micro-section">
+      <h2>Voz en tiempo real</h2>
+      <div class="controls">
+        <button id="toggle-mic" class="primary">Iniciar micrófono</button>
+        <span id="mic-status" class="status status-off">Micrófono inactivo</span>
+      </div>
+      <div class="meters">
+        <label for="input-meter">Nivel de entrada</label>
+        <progress id="input-meter" min="0" max="1" value="0"></progress>
+        <label for="output-meter">Nivel de salida</label>
+        <progress id="output-meter" min="0" max="1" value="0"></progress>
+      </div>
+    </section>
+
+    <section class="card" id="profiles">
+      <h2>Voces predeterminadas</h2>
+      <p>Escoge una de las voces enmascaradas ultra graves o crea la tuya.</p>
+      <div class="profile-grid">
+        <button class="profile" data-profile="warden">⚙️ Warden</button>
+        <button class="profile" data-profile="leviathan">🐉 Leviathan</button>
+        <button class="profile" data-profile="shadow">🜂 Shadow</button>
+      </div>
+      <div class="ai-coach">
+        <h3>Asistente IA</h3>
+        <p>La IA analiza tu señal y sugiere configuraciones para mantener una voz estable y oculta.</p>
+        <div class="ai-suggestion">
+          <span>Pitch sugerido: <strong id="ai-pitch">-</strong></span>
+          <span>Distorsión sugerida: <strong id="ai-distortion">-</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="manual">
+      <h2>Ajustes manuales</h2>
+      <div class="slider">
+        <label for="pitch-slider">Pitch shifting</label>
+        <input type="range" id="pitch-slider" min="0.3" max="1.2" step="0.01" value="0.7" />
+        <span class="value" id="pitch-value">0.70x</span>
+      </div>
+      <div class="slider">
+        <label for="distortion-slider">Distorsión</label>
+        <input type="range" id="distortion-slider" min="0" max="1" step="0.01" value="0.35" />
+        <span class="value" id="distortion-value">35%</span>
+      </div>
+      <div class="slider">
+        <label for="lowpass-slider">Filtro paso bajo</label>
+        <input type="range" id="lowpass-slider" min="200" max="4000" step="10" value="1200" />
+        <span class="value" id="lowpass-value">1200 Hz</span>
+      </div>
+    </section>
+
+    <section class="card" id="tts">
+      <h2>Texto a voz enmascarado</h2>
+      <div class="tts-grid">
+        <textarea id="tts-text" rows="4" placeholder="Escribe el mensaje a sintetizar..."></textarea>
+        <div class="tts-controls">
+          <label for="voice-select">Voz del sistema</label>
+          <select id="voice-select"></select>
+          <button id="speak-btn" class="primary">Reproducir con pitch actual</button>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>Optimizado para ejecutarse en Safari y enlazarse con Atajos de iOS.</p>
+      <small>Incluye algoritmo de recomendación IA ligero para proteger tu identidad vocal.</small>
+    </footer>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
